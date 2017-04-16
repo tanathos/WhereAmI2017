@@ -62,7 +62,7 @@ namespace WhereAmI2017
         /// adds the the square in the upper right-hand corner of the TextView via the adornment layer
         /// </summary>
         /// <param name="view">The <see cref="IWpfTextView"/> upon which the adornment will be drawn</param>
-        public WhereAmI(IWpfTextView view)
+        public WhereAmI(IWpfTextView view, IWhereAmISettings settings)
         {
             if (view == null)
             {

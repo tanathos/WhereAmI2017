@@ -31,6 +31,9 @@ namespace WhereAmI2017
         [Order(After = PredefinedAdornmentLayers.Caret)]
         private AdornmentLayerDefinition editorAdornmentLayer;
 
+        [Import]
+        internal IWhereAmISettings Settings { get; set; }
+
 #pragma warning restore 649, 169
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace WhereAmI2017
         public void TextViewCreated(IWpfTextView textView)
         {
             // The adorment will get wired to the text view events
-            new WhereAmI(textView);
+            new WhereAmI(textView, Settings);
         }
     }
 }

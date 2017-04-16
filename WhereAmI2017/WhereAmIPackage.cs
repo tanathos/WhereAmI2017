@@ -7,7 +7,7 @@ namespace WhereAmI2017
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "0.1", IconResourceID = 400)]
-    [ProvideOptionPageAttribute(typeof(OptionsPageGeneral), "My Options Page (C#)", "General", 0, 0, supportsAutomation: true)]
+    [ProvideOptionPageAttribute(typeof(OptionsPageGeneral), "Where Am I", "General", 0, 0, supportsAutomation: true)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [Guid(GuidStrings.GuidPackage)]
     public sealed class WhereAmIPackage : Package
