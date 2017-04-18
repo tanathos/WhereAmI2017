@@ -27,7 +27,7 @@ namespace WhereAmI2017
         /// after the selection layer in the Z-order
         /// </summary>
         [Export(typeof(AdornmentLayerDefinition))]
-        [Name("WhereAmI")]
+        [Name(Constants.AdornmentLayerName)]
         [Order(After = PredefinedAdornmentLayers.Caret)]
         private AdornmentLayerDefinition editorAdornmentLayer;
 

@@ -3,10 +3,8 @@ using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell.Settings;
 using System;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using WhereAmI2017.Converters;
@@ -18,15 +16,9 @@ namespace WhereAmI2017
     // with support for the Visual Studio automation model, Windows Forms, and state 
     // persistence through the Visual Studio settings mechanism.
     /// </summary>
-    [Guid(GuidStrings.GuidPageGeneral)]
-    [Export(typeof(IWhereAmISettings))]
-    public class OptionsPageGeneral : Microsoft.VisualStudio.Shell.DialogPage, IWhereAmISettings
+    [Guid(Constants.GuidPageGeneral)]
+    public class OptionsPageGeneral : Microsoft.VisualStudio.Shell.DialogPage
     {
-        /// <summary>
-        /// The real store in which the settings will be saved
-        /// </summary>
-        readonly WritableSettingsStore writableSettingsStore;
-
         IWhereAmISettings settings
         {
             get
@@ -39,15 +31,6 @@ namespace WhereAmI2017
         }
 
         #region Constructors
-
-        [ImportingConstructor]
-        public OptionsPageGeneral(SVsServiceProvider vsServiceProvider) : this()
-        {
-            var shellSettingsManager = new ShellSettingsManager(vsServiceProvider);
-            writableSettingsStore = shellSettingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-
-            LoadSettings();
-        }
 
         public OptionsPageGeneral()
         {
@@ -66,6 +49,7 @@ namespace WhereAmI2017
 
         #region Properties
 
+        [Browsable(true)]
         [Category("File name")]
         [Description("The color of the filename part")]
         [DisplayName("Filename color")]
@@ -76,6 +60,7 @@ namespace WhereAmI2017
         [DisplayName("Show")]
         public bool ViewFilename { get; set; }
 
+        [Browsable(true)]
         [Category("Folder")]
         [Description("The color of the folder part")]
         [DisplayName("Folder color")]
@@ -86,6 +71,7 @@ namespace WhereAmI2017
         [DisplayName("Show")]
         public bool ViewFolders { get; set; }
 
+        [Browsable(true)]
         [Category("Project")]
         [Description("The color of the project part")]
         [DisplayName("Project color")]
@@ -117,7 +103,10 @@ namespace WhereAmI2017
         [TypeConverter(typeof(PercentageConverter))]
         public double Opacity { get; set; }
 
-        // TODO
+        [Category("Appearance")]
+        [DisplayName("Position")]
+        [Description("The position in the view of the text block")]
+        [Browsable(true)]
         public AdornmentPositions Position { get; set; }
 
         #endregion Properties
@@ -133,48 +122,9 @@ namespace WhereAmI2017
         /// <remarks>If this handler sets e.Cancel to true, the activation will not occur.</remarks>
         protected override void OnActivate(CancelEventArgs e)
         {
-            int result = VsShellUtilities.ShowMessageBox(Site, "Resources.MessageOnActivateEntered", null /*title*/, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-
-            if (result == (int)VSConstants.MessageBoxResult.IDCANCEL)
-            {
-                e.Cancel = true;
-            }
-
             base.OnActivate(e);
 
             BindSettings();
-        }
-
-        /// <summary>
-        /// Handles "close" messages from the Visual Studio environment.
-        /// </summary>
-        /// <devdoc>
-        /// This event is raised when the page is closed.
-        /// </devdoc>
-        protected override void OnClosed(EventArgs e)
-        {
-            VsShellUtilities.ShowMessageBox(Site, "Resources.MessageOnClosed", null /*title*/, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-        }
-
-        /// <summary>
-        /// Handles "deactivate" messages from the Visual Studio environment.
-        /// </summary>
-        /// <devdoc>
-        /// This method is called when VS wants to deactivate this
-        /// page.  If this handler sets e.Cancel, the deactivation will not occur.
-        /// </devdoc>
-        /// <remarks>
-        /// A "deactivate" message is sent when focus changes to a different page in
-        /// the dialog.
-        /// </remarks>
-        protected override void OnDeactivate(CancelEventArgs e)
-        {
-            int result = VsShellUtilities.ShowMessageBox(Site, "Resources.MessageOnDeactivateEntered", null /*title*/, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-
-            if (result == (int)VSConstants.MessageBoxResult.IDCANCEL)
-            {
-                e.Cancel = true;
-            }
         }
 
         /// <summary>
@@ -186,7 +136,8 @@ namespace WhereAmI2017
         /// </devdoc>
         protected override void OnApply(PageApplyEventArgs e)
         {
-            int result = VsShellUtilities.ShowMessageBox(Site, "Resources.MessageOnApplyEntered", null /*title*/, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            // TODO: calculate the Hash of the stored settings and of the changed to see if there's a change and ask the confirmation:
+            int result = VsShellUtilities.ShowMessageBox(Site, Resources.MessageOnApplyEntered, Resources.Confirm, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
 
             if (result == (int)VSConstants.MessageBoxResult.IDCANCEL)
             {
@@ -194,135 +145,31 @@ namespace WhereAmI2017
             }
             else
             {
+                if (e.ApplyBehavior == ApplyKind.Apply)
+                {
+                    settings.FilenameColor = FilenameColor;
+                    settings.FoldersColor = FoldersColor;
+                    settings.ProjectColor = ProjectColor;
+
+                    settings.FilenameSize = FilenameSize;
+                    settings.FoldersSize = FoldersSize;
+                    settings.ProjectSize = ProjectSize;
+
+                    settings.ViewFilename = ViewFilename;
+                    settings.ViewFolders = ViewFolders;
+                    settings.ViewProject = ViewProject;
+
+                    settings.Position = Position;
+                    settings.Opacity = Opacity;
+
+                    settings.Store();
+                }
+
                 base.OnApply(e);
             }
-
-            VsShellUtilities.ShowMessageBox(Site, "Resources.MessageOnApply", null /*title*/, OLEMSGICON.OLEMSGICON_INFO, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-        }
-
-        public void Store()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Defaults()
-        {
-            throw new NotImplementedException();
         }
 
         #endregion Event Handlers
-
-        private void LoadSettings()
-        {
-            // Default values
-            FilenameSize = 60;
-            FoldersSize = ProjectSize = 52;
-
-            FilenameColor = Color.FromArgb(234, 234, 234);
-            FoldersColor = ProjectColor = Color.FromArgb(243, 243, 243);
-
-            Position = AdornmentPositions.TopRight;
-
-            Opacity = 1;
-
-            //try
-            //{
-            //    // Retrieve the Id of the current theme used in VS from user's settings, this is changed a lot in VS2015
-            //    string visualStudioThemeId = VSRegistry.RegistryRoot(Microsoft.VisualStudio.Shell.Interop.__VsLocalRegistryType.RegType_UserSettings).OpenSubKey("ApplicationPrivateSettings").OpenSubKey("Microsoft").OpenSubKey("VisualStudio").GetValue("ColorTheme", "de3dbbcd-f642-433c-8353-8f1df4370aba", Microsoft.Win32.RegistryValueOptions.DoNotExpandEnvironmentNames).ToString();
-
-            //    string parsedThemeId = Guid.Parse(visualStudioThemeId.Split('*')[2]).ToString();
-
-            //    switch (parsedThemeId)
-            //    {
-            //        case "de3dbbcd-f642-433c-8353-8f1df4370aba": // Light
-            //        case "a4d6a176-b948-4b29-8c66-53c97a1ed7d0": // Blue
-            //        default:
-            //            // Just use the defaults
-            //            break;
-
-            //        case "1ded0138-47ce-435e-84ef-9ec1f439b749": // Dark
-            //            _FilenameColor = Color.FromArgb(48, 48, 48);
-            //            _FoldersColor = _ProjectColor = Color.FromArgb(40, 40, 40);
-            //            break;
-            //    }
-
-            //    // Tries to retrieve the configurations if previously saved
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "FilenameColor"))
-            //    {
-            //        this.FilenameColor = Color.FromArgb(writableSettingsStore.GetInt32(CollectionPath, "FilenameColor", this.FilenameColor.ToArgb()));
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "FoldersColor"))
-            //    {
-            //        this.FoldersColor = Color.FromArgb(writableSettingsStore.GetInt32(CollectionPath, "FoldersColor", this.FoldersColor.ToArgb()));
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "ProjectColor"))
-            //    {
-            //        this.ProjectColor = Color.FromArgb(writableSettingsStore.GetInt32(CollectionPath, "ProjectColor", this.ProjectColor.ToArgb()));
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "ViewFilename"))
-            //    {
-            //        bool b = this.ViewFilename;
-            //        if (Boolean.TryParse(writableSettingsStore.GetString(CollectionPath, "ViewFilename"), out b))
-            //            this.ViewFilename = b;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "ViewFolders"))
-            //    {
-            //        bool b = this.ViewFolders;
-            //        if (Boolean.TryParse(writableSettingsStore.GetString(CollectionPath, "ViewFolders"), out b))
-            //            this.ViewFolders = b;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "ViewProject"))
-            //    {
-            //        bool b = this.ViewProject;
-            //        if (Boolean.TryParse(writableSettingsStore.GetString(CollectionPath, "ViewProject"), out b))
-            //            this.ViewProject = b;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "FilenameSize"))
-            //    {
-            //        double d = this.FilenameSize;
-            //        if (Double.TryParse(writableSettingsStore.GetString(CollectionPath, "FilenameSize"), out d))
-            //            this.FilenameSize = d;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "FoldersSize"))
-            //    {
-            //        double d = this.FoldersSize;
-            //        if (Double.TryParse(writableSettingsStore.GetString(CollectionPath, "FoldersSize"), out d))
-            //            this.FoldersSize = d;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "ProjectSize"))
-            //    {
-            //        double d = this.ProjectSize;
-            //        if (Double.TryParse(writableSettingsStore.GetString(CollectionPath, "ProjectSize"), out d))
-            //            this.ProjectSize = d;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "Position"))
-            //    {
-            //        AdornmentPositions p = this.Position;
-            //        if (Enum.TryParse<AdornmentPositions>(writableSettingsStore.GetString(CollectionPath, "Position"), out p))
-            //            this.Position = p;
-            //    }
-
-            //    if (writableSettingsStore.PropertyExists(CollectionPath, "Opacity"))
-            //    {
-            //        double d = this.Opacity;
-            //        if (Double.TryParse(writableSettingsStore.GetString(CollectionPath, "Opacity"), out d))
-            //            this.Opacity = d;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.Fail(ex.Message);
-            //}
-        }
 
         private void BindSettings()
         {
