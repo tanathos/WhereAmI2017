@@ -136,34 +136,54 @@ namespace WhereAmI2017
         /// </devdoc>
         protected override void OnApply(PageApplyEventArgs e)
         {
-            // TODO: calculate the Hash of the stored settings and of the changed to see if there's a change and ask the confirmation:
-            int result = VsShellUtilities.ShowMessageBox(Site, Resources.MessageOnApplyEntered, Resources.Confirm, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            IWhereAmISettings storedValues = settings;
+
+            IWhereAmISettings currentValues = new WhereAmISettings() {
+                FilenameColor = FilenameColor,
+                FoldersColor = FoldersColor,
+                ProjectColor = ProjectColor,
+
+                FilenameSize = FilenameSize,
+                FoldersSize = FoldersSize,
+                ProjectSize = ProjectSize,
+
+                ViewFilename = ViewFilename,
+                ViewFolders = ViewFolders,
+                ViewProject = ViewProject,
+
+                Position = Position,
+                Opacity = Opacity
+            };
+
+            int result = (int)VSConstants.MessageBoxResult.IDOK;
+
+            if (!storedValues.Equals(currentValues))
+            {
+                result = VsShellUtilities.ShowMessageBox(Site, Resources.MessageOnApplyEntered, Resources.Confirm, OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
 
             if (result == (int)VSConstants.MessageBoxResult.IDCANCEL)
             {
                 e.ApplyBehavior = ApplyKind.Cancel;
             }
-            else
+            else if (e.ApplyBehavior == ApplyKind.Apply)
             {
-                if (e.ApplyBehavior == ApplyKind.Apply)
-                {
-                    settings.FilenameColor = FilenameColor;
-                    settings.FoldersColor = FoldersColor;
-                    settings.ProjectColor = ProjectColor;
+                settings.FilenameColor = currentValues.FilenameColor;
+                settings.FoldersColor = currentValues.FoldersColor;
+                settings.ProjectColor = currentValues.ProjectColor;
 
-                    settings.FilenameSize = FilenameSize;
-                    settings.FoldersSize = FoldersSize;
-                    settings.ProjectSize = ProjectSize;
+                settings.FilenameSize = currentValues.FilenameSize;
+                settings.FoldersSize = currentValues.FoldersSize;
+                settings.ProjectSize = currentValues.ProjectSize;
 
-                    settings.ViewFilename = ViewFilename;
-                    settings.ViewFolders = ViewFolders;
-                    settings.ViewProject = ViewProject;
+                settings.ViewFilename = currentValues.ViewFilename;
+                settings.ViewFolders = currentValues.ViewFolders;
+                settings.ViewProject = currentValues.ViewProject;
 
-                    settings.Position = Position;
-                    settings.Opacity = Opacity;
+                settings.Position = currentValues.Position;
+                settings.Opacity = currentValues.Opacity;
 
-                    settings.Store();
-                }
+                settings.Store();
 
                 base.OnApply(e);
             }

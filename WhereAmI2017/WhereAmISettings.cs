@@ -211,5 +211,34 @@ namespace WhereAmI2017
                 Debug.Fail(ex.Message);
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            WhereAmISettings o = obj as WhereAmISettings;
+
+            return o.GetHashCode() == this.GetHashCode();
+        }
+
+        /// <summary>
+        /// Overridden GetHasCode
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            int hash = 13;
+            hash = (hash * 7) + this.FilenameColor.GetHashCode();
+            hash = (hash * 7) + this.FilenameSize.GetHashCode();
+            hash = (hash * 7) + this.FoldersColor.GetHashCode();
+            hash = (hash * 7) + this.FoldersSize.GetHashCode();
+            hash = (hash * 7) + this.Opacity.GetHashCode();
+            hash = (hash * 7) + this.Position.GetHashCode();
+            hash = (hash * 7) + this.ProjectColor.GetHashCode();
+            hash = (hash * 7) + this.ProjectSize.GetHashCode();
+            hash = (hash * 7) + this.ViewFilename.GetHashCode();
+            hash = (hash * 7) + this.ViewFolders.GetHashCode();
+            hash = (hash * 7) + this.ViewProject.GetHashCode();
+
+            return hash;
+        }
     }
 }
