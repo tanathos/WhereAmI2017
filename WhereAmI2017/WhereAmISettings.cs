@@ -63,6 +63,8 @@ namespace WhereAmI2017
         public double Opacity { get { return _Opacity; } set { _Opacity = value; } }
         private double _Opacity;
 
+        public Theme Theme { get { return _Theme; } set { _Theme = value; } }
+        private Theme _Theme;
 
         public void Store()
         {
@@ -87,6 +89,7 @@ namespace WhereAmI2017
 
                 writableSettingsStore.SetString(Constants.SettingsCollectionPath, "Position", this.Position.ToString());
                 writableSettingsStore.SetString(Constants.SettingsCollectionPath, "Opacity", this.Opacity.ToString());
+                writableSettingsStore.SetString(Constants.SettingsCollectionPath, "Theme", this.Theme.ToString());
             }
             catch (Exception ex)
             {
@@ -103,15 +106,18 @@ namespace WhereAmI2017
         private void LoadSettings()
         {
             // Default values
-            _FilenameSize = 60;
-            _FoldersSize = _ProjectSize = 52;
+            var lightTheme = this.LightThemeDefaults();
+            _FilenameSize = lightTheme.FilenameSize;
+            _FoldersSize = _ProjectSize = lightTheme.FoldersSize;
 
-            _FilenameColor = Color.FromArgb(234, 234, 234);
-            _FoldersColor = _ProjectColor = Color.FromArgb(243, 243, 243);
+            _FilenameColor = lightTheme.FilenameColor;
+            _FoldersColor = _ProjectColor = lightTheme.FoldersColor;
 
-            _Position = AdornmentPositions.TopRight;
+            _Position = lightTheme.Position;
 
-            _Opacity = 1;
+            _Opacity = lightTheme.Opacity;
+            _ViewFilename = _ViewFolders = _ViewProject = lightTheme.ViewFilename;
+            _Theme = lightTheme.Theme;
 
             try
             {
@@ -129,8 +135,18 @@ namespace WhereAmI2017
                         break;
 
                     case Constants.VisualStudioDarkThemeId: // Dark
-                        _FilenameColor = Color.FromArgb(48, 48, 48);
-                        _FoldersColor = _ProjectColor = Color.FromArgb(40, 40, 40);
+                        var darkTheme = this.DarkThemeDefaults();
+                        _FilenameSize = darkTheme.FilenameSize;
+                        _FoldersSize = _ProjectSize = darkTheme.FoldersSize;
+
+                        _FilenameColor = darkTheme.FilenameColor;
+                        _FoldersColor = _ProjectColor = darkTheme.FoldersColor;
+
+                        _Position = darkTheme.Position;
+
+                        _Opacity = darkTheme.Opacity;
+                        _ViewFilename = _ViewFolders = _ViewProject = darkTheme.ViewFilename;
+                        _Theme = darkTheme.Theme;
                         break;
                 }
 
@@ -239,6 +255,48 @@ namespace WhereAmI2017
             hash = (hash * 7) + this.ViewProject.GetHashCode();
 
             return hash;
+        }
+
+        private IWhereAmISettings DarkThemeDefaults()
+        {
+            WhereAmISettings settings = new WhereAmISettings();
+            settings.FilenameSize = 60;
+            settings.FoldersSize = settings.ProjectSize = 52;
+
+            settings.FilenameColor = Color.FromArgb(48, 48, 48);
+            settings.FoldersColor = settings.ProjectColor = Color.FromArgb(40, 40, 40);
+
+            settings.Position = AdornmentPositions.TopRight;
+
+            settings.Opacity = 1;
+            settings.ViewFilename = true;
+            settings.ViewFolders = true;
+            settings.ViewProject = true;
+
+            settings.Theme = Theme.Dark;
+
+            return settings;
+        }
+
+        private IWhereAmISettings LightThemeDefaults()
+        {
+            WhereAmISettings settings = new WhereAmISettings();
+            settings.FilenameSize = 60;
+            settings.FoldersSize = settings.ProjectSize = 52;
+
+            settings.FilenameColor = Color.FromArgb(234, 234, 234);
+            settings.FoldersColor = settings.ProjectColor = Color.FromArgb(243, 243, 243);
+
+            settings.Position = AdornmentPositions.TopRight;
+
+            settings.Opacity = 1;
+            settings.ViewFilename = true;
+            settings.ViewFolders = true;
+            settings.ViewProject = true;
+
+            settings.Theme = Theme.Light;
+
+            return settings;
         }
     }
 }

@@ -109,6 +109,12 @@ namespace WhereAmI2017
         [Browsable(true)]
         public AdornmentPositions Position { get; set; }
 
+        [Category("Misc")]
+        [DisplayName("Theme")]
+        [Description("Changing this you'll reset to a specific theme")]
+        [Browsable(true)]
+        public Theme ResetToTheme { get; set; }
+
         #endregion Properties
 
         #region Event Handlers

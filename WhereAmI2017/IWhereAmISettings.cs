@@ -68,6 +68,11 @@ namespace WhereAmI2017
         double Opacity { get; set; }
 
         /// <summary>
+        /// The theme corresponding to the current settings
+        /// </summary>
+        Theme Theme { get; set; }
+
+        /// <summary>
         /// Performs the store of the instance of this interface to the user's settings
         /// </summary>
         void Store();
