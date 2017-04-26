@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="eaf4b76d-cf61-42c2-b1a0-0f1787f7cb2e" Version="0.5" Language="en-US" Publisher="Eros Fratini" />
+    <Identity Id="eaf4b76d-cf61-42c2-b1a0-0f1787f7cb2e" Version="1.0" Language="en-US" Publisher="Eros Fratini" />
     <DisplayName>WhereAmI 2017</DisplayName>
     <Description xml:space="preserve">WhereAmI 2017</Description>
     <License>LICENSE.txt</License>

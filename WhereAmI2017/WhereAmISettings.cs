@@ -106,7 +106,7 @@ namespace WhereAmI2017
         private void LoadSettings()
         {
             // Default values
-            var lightTheme = this.LightThemeDefaults();
+            var lightTheme = WhereAmISettings.LightThemeDefaults();
             _FilenameSize = lightTheme.FilenameSize;
             _FoldersSize = _ProjectSize = lightTheme.FoldersSize;
 
@@ -135,7 +135,7 @@ namespace WhereAmI2017
                         break;
 
                     case Constants.VisualStudioDarkThemeId: // Dark
-                        var darkTheme = this.DarkThemeDefaults();
+                        var darkTheme = WhereAmISettings.DarkThemeDefaults();
                         _FilenameSize = darkTheme.FilenameSize;
                         _FoldersSize = _ProjectSize = darkTheme.FoldersSize;
 
@@ -257,7 +257,7 @@ namespace WhereAmI2017
             return hash;
         }
 
-        private IWhereAmISettings DarkThemeDefaults()
+        public static IWhereAmISettings DarkThemeDefaults()
         {
             WhereAmISettings settings = new WhereAmISettings();
             settings.FilenameSize = 60;
@@ -278,7 +278,7 @@ namespace WhereAmI2017
             return settings;
         }
 
-        private IWhereAmISettings LightThemeDefaults()
+        public static IWhereAmISettings LightThemeDefaults()
         {
             WhereAmISettings settings = new WhereAmISettings();
             settings.FilenameSize = 60;

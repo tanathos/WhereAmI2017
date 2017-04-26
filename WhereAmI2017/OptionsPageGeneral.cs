@@ -113,7 +113,45 @@ namespace WhereAmI2017
         [DisplayName("Theme")]
         [Description("Changing this you'll reset to a specific theme")]
         [Browsable(true)]
-        public Theme ResetToTheme { get; set; }
+        public Theme ResetToTheme
+        {
+            get
+            {
+                return settings.Theme;
+            }
+            set
+            {
+                IWhereAmISettings selectedTheme = null;
+
+                if (value == Theme.Dark)
+                {
+                    selectedTheme = WhereAmISettings.DarkThemeDefaults();
+                }
+                else if (value == Theme.Light)
+                {
+                    selectedTheme = WhereAmISettings.LightThemeDefaults();
+                }
+
+                _ResetToTheme = value;
+
+                if (selectedTheme != null)
+                {
+                    this.FilenameColor = selectedTheme.FilenameColor;
+                    this.FilenameSize = selectedTheme.FilenameSize;
+                    this.FoldersColor = selectedTheme.FoldersColor;
+                    this.FoldersSize = selectedTheme.FoldersSize;
+                    this.Opacity = selectedTheme.Opacity;
+                    this.Position = selectedTheme.Position;
+                    this.ProjectColor = selectedTheme.ProjectColor;
+                    this.ProjectSize = selectedTheme.ProjectSize;
+                    this.ViewFilename = selectedTheme.ViewFilename;
+                    this.ViewFolders = selectedTheme.ViewFolders;
+                    this.ViewProject = selectedTheme.ViewProject;
+                }
+            } 
+        }
+
+        private Theme _ResetToTheme;
 
         #endregion Properties
 
@@ -188,6 +226,13 @@ namespace WhereAmI2017
 
                 settings.Position = currentValues.Position;
                 settings.Opacity = currentValues.Opacity;
+
+                if (WhereAmISettings.DarkThemeDefaults().Equals(currentValues))
+                    settings.Theme = Theme.Dark;
+                else if (WhereAmISettings.LightThemeDefaults().Equals(currentValues))
+                    settings.Theme = Theme.Light;
+                else
+                    settings.Theme = Theme.Custom;
 
                 settings.Store();
 

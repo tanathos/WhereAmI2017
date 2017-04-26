@@ -1,3 +1,4 @@
 ﻿WhereAmI 2017 - Changelog
 --------------------
 
+1.0 - All the functionalities of the previous versions + the ability to switch theme

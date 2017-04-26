@@ -28,7 +28,7 @@ namespace WhereAmI2017
         /// </summary>
         [Export(typeof(AdornmentLayerDefinition))]
         [Name(Constants.AdornmentLayerName)]
-        [Order(After = PredefinedAdornmentLayers.Caret)]
+        [Order(Before = PredefinedAdornmentLayers.Text)]
         private AdornmentLayerDefinition editorAdornmentLayer;
 
         [Import]
