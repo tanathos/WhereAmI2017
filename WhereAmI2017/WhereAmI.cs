@@ -68,7 +68,7 @@ namespace WhereAmI2017
             {
                 string fileName = System.IO.Path.GetFileName(textDoc.FilePath);
 
-                Project proj = GetContainingProject(fileName);
+                Project proj = GetContainingProject(textDoc.FilePath);
                 if (proj != null)
                 {
                     string projectName = proj.Name;
